@@ -13,7 +13,7 @@
 
 	<div> <ui-view></ui-view> </div>
 
-	<div ng-repeat="post in posts | orderBy: '-upvotes'">
+	<!-- <div ng-repeat="post in posts | orderBy: '-upvotes'">
 		<span ng-click="incrementUpvotes(post)">+</span>
 		<a ng-show="post.link" href="{{post.link}}">
 			{{post.title}}
@@ -22,7 +22,7 @@
 			{{post.link}}
 		</span>
 		| {{post.upvotes}}
-	</div>
+	</div> -->
 
 	<form ng-submit="addPost()">
 		<input type="text" ng-model="title" placeholder="title"></input>
@@ -30,13 +30,55 @@
 		<button type="submit">Post</button>
 	</form>
 
+	<!-- Home Template -->
 	<script type="text/ng-template" id="/home.html">
-  <div>
-    <h2>Home</h2>
-  </div>
+	  <div>
+	    <h2>Home</h2>
+	  </div>
 
-  <!-- rest of template -->
+	  <span ng-repeat="post in posts">
+		
+  		<h3>
+			<a ng-show="post.link" href="{{post.link}}">
+				{{post.title}}
+			</a>
+			<span ng-hide="post.link">
+				{{post.title}}
+			</span> |
+			<a href="#/posts/{{$index}}">Comments</a>
+			</h3>
+
+		</span>
+
+
+
 	</script>
+
+	<!-- Posts Template -->
+	<script type="text/ng-template" id="/posts.html">
+		<div>
+			<h2><Posts</h2>	
+		</div>
+
+		<h3>
+			<a ng-show="post.link" href="{{post.link}}">
+				{{post.title}}
+			</a>
+			<span ng-hide="post.link">
+				{{post.title}}
+			</span>
+		</h3>
+
+		<div ng-repeat="comment in post.comments | orderBy: '-upvotes'">
+			<span ng-click="incrementUpvotes(comment)">+</span>
+			{{comment.upvotes}} - by {{comment.author}}
+			<span style="font-size:20px; margin-left:10px;">
+				{{comment.body}}
+			</span>
+		</div>	
+	</script>
+
+
 
 </body>
 </html>
