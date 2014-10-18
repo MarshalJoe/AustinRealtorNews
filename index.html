@@ -24,11 +24,7 @@
 		| {{post.upvotes}}
 	</div> -->
 
-	<form ng-submit="addPost()">
-		<input type="text" ng-model="title" placeholder="title"></input>
-		<input type="text" ng-model="link" placeholder="link"></input>
-		<button type="submit">Post</button>
-	</form>
+	
 
 	<!-- Home Template -->
 	<script type="text/ng-template" id="/home.html">
@@ -38,7 +34,7 @@
 
 	  <span ng-repeat="post in posts">
 		
-  		<h3>
+  		<p>
 			<a ng-show="post.link" href="{{post.link}}">
 				{{post.title}}
 			</a>
@@ -46,9 +42,15 @@
 				{{post.title}}
 			</span> |
 			<a href="#/posts/{{$index}}">Comments</a>
-			</h3>
+			</p>
 
 		</span>
+
+		<form ng-submit="addPost()">
+			<input type="text" ng-model="title" placeholder="title"></input>
+			<input type="text" ng-model="link" placeholder="link"></input>
+			<button type="submit">Post</button>
+		</form>
 
 
 
