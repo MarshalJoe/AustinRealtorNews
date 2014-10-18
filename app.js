@@ -3,11 +3,14 @@ var app = angular.module('realtorNews', []);
 app.factory('postFactory', function() {
 	var factory = {}
 	factory.posts = [
-		{title: 'post 1', link:"https://www.facebook.com", upvotes: 5},
-		{title: 'post 2', link:"https://www.twitter.com", upvotes: 2}
+		{title: 'Facebook is neat', link:"https://www.facebook.com", upvotes: 5},
+		{title: 'Twitter is cool too', link:"https://www.twitter.com", upvotes: 2},
+		{title: 'More smashing stuff!', link:"https://www.facebook.com", upvotes: 5},
+		{title: "Look here's another link", link:"https://www.twitter.com", upvotes: 2}
 	]
 	return factory;
 });
+
 
 app.controller('MainCtrl', [
 '$scope',
