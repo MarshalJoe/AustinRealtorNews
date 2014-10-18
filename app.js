@@ -21,6 +21,7 @@ function ($scope, postFactory) {
 			link: $scope.link, 
 			upvotes: 0});
 		$scope.title = '';
+		$scope.link = '';
 	};
 	$scope.incrementUpvotes = function (post) {
 		post.upvotes += 1;
