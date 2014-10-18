@@ -1,11 +1,96 @@
-<!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<head>
+	<title>Austin Realtor News</title>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+	<script src="/javascripts/angularApp.js"></script>
+
+</head>
+<body ng-app="realtorNews" ng-controller="MainCtrl">
+
+	<h1>Austin Realtor News</h1></a>
+
+	<div> <ui-view></ui-view> </div>
+
+	<!-- <div ng-repeat="post in posts | orderBy: '-upvotes'">
+		<span ng-click="incrementUpvotes(post)">+</span>
+		<a ng-show="post.link" href="{{post.link}}">
+			{{post.title}}
+		</a>
+		<span ng-hide="post.link">
+			{{post.link}}
+		</span>
+		| {{post.upvotes}}
+	</div> -->
+
+	
+
+	<!-- Home Template -->
+	<script type="text/ng-template" id="/home.html">
+	  <div>
+	    <h2>Home</h2>
+	  </div>
+
+	  <span ng-repeat="post in posts">
+		
+  		<p>
+			<a ng-show="post.link" href="{{post.link}}">
+				{{post.title}}
+			</a>
+			<span ng-hide="post.link">
+				{{post.title}}
+			</span> |
+			<a href="#/posts/{{$index}}">Comments</a>
+			</p>
+
+		</span>
+
+		<form ng-submit="addPost()">
+			<input type="text" ng-model="title" placeholder="title"></input>
+			<input type="text" ng-model="link" placeholder="link"></input>
+			<button type="submit">Post</button>
+		</form>
+
+
+
+	</script>
+
+	<!-- Posts Template -->
+	<script type="text/ng-template" id="/posts.html">
+		<div>
+			<h2><Posts</h2>	
+		</div>
+
+		<h3>
+			<a ng-show="post.link" href="{{post.link}}">
+				{{post.title}}
+			</a>
+			<span ng-hide="post.link">
+				{{post.title}}
+			</span>
+		</h3>
+
+		<div ng-repeat="comment in post.comments | orderBy: '-upvotes'">
+			<span ng-click="incrementUpvotes(comment)">+</span>
+			{{comment.upvotes}} - by {{comment.author}}
+			<span style="font-size:20px; margin-left:10px;">
+				{{comment.body}}
+			</span>
+		</div>
+
+		<form ng-submit="addComment()" style="margin-top:30px;">
+			<h3>Add a new comment</h3>
+			<input type="text" placeholder="Comment" ng-model="body"></input>
+			<button type="submit">Post</button>
+		</form>
+
+
+
+
+	</script>
+
+
+
+</body>
 </html>
