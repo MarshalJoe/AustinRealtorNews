@@ -25,7 +25,7 @@ app.config([
 app.factory('postFactory', function() {
 	var factory = {}
 	factory.posts = [
-		{title: 'Facebook is neat', link:"https://www.facebook.com", upvotes: 5},
+		{title: 'Facebook Facebook', link:"https://www.facebook.com", upvotes: 5},
 		{title: 'Twitter is cool too', link:"https://www.twitter.com", upvotes: 2},
 		{title: 'More smashing stuff!', link:"https://www.facebook.com", upvotes: 5},
 		{title: "Look here's another link", link:"https://www.twitter.com", upvotes: 2}
