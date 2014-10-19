@@ -35,13 +35,15 @@
 	  <span ng-repeat="post in posts">
 		
   		<p>
+  		<span ng-click="incrementUpvotes(post)">+</span>		
 			<a ng-show="post.link" href="{{post.link}}">
 				{{post.title}}
 			</a>
 			<span ng-hide="post.link">
 				{{post.title}}
-			</span> |
+			</span> {{post.upvotes}} |
 			<a href="#/posts/{{$index}}">Comments</a>
+			
 			</p>
 
 		</span>

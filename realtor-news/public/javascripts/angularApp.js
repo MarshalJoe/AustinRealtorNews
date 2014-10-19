@@ -42,7 +42,12 @@ app.factory('postFactory', ['$http', function ($http) {
 			factory.posts.push(data);
 		})
 	};
-
+	factory.upvote = function (post) {
+		return $http.put('/posts/' + post._id + '/upvote')
+			.success(function (data) {
+				post.upvotes += 1;
+			});
+	};
 	return factory;
 }]);
 
@@ -63,7 +68,7 @@ function ($scope, postFactory) {
 		$scope.link = '';
 	};
 	$scope.incrementUpvotes = function (post) {
-		post.upvotes += 1;
+		postFactory.upvote(post);
 	};
 }]);
 
