@@ -27,6 +27,8 @@ app.config([
 		$urlRouterProvider.otherwise('home');
 	}]);
 
+
+// Factory service for Mongo
 app.factory('postFactory', ['$http', function ($http) {
 	var factory = {}
 	factory.posts = [];
@@ -35,6 +37,12 @@ app.factory('postFactory', ['$http', function ($http) {
 			angular.copy(data, factory.posts);
 		});
 	};
+	factory.create = function (post) {
+		return $http.post('/posts', post).success(function (data) {
+			factory.posts.push(data);
+		})
+	};
+
 	return factory;
 }]);
 
@@ -46,14 +54,10 @@ function ($scope, postFactory) {
 	$scope.posts = postFactory.posts;
 	$scope.addPost = function () {
 		if($scope.title === '') {return;}
-		$scope.posts.push({
+		postFactory.create({
 			title: $scope.title,
 			link: $scope.link, 
 			upvotes: 0,
-			comments: [
-				{author: 'Joe', body: 'Cool Post!', upvotes: 0},
-				{author: 'Bob', body: 'Great idea but everything is wrong!', upvotes: 0}
-			]
 		});
 		$scope.title = '';
 		$scope.link = '';
