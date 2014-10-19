@@ -32,7 +32,7 @@
 	    <h2>Home</h2>
 	  </div>
 
-	  <span ng-repeat="post in posts">
+	  <span ng-repeat="post in posts | orderBy: '-upvotes'">
 		
   		<p>
   		<span ng-click="incrementUpvotes(post)">+</span>		
