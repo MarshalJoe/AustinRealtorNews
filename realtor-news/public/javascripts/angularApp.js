@@ -9,7 +9,12 @@ app.config([
 			.state('home', {
 				url: '/home',
 				templateUrl: '/home.html',
-				controller: 'MainCtrl'
+				controller: 'MainCtrl',
+				resolve: {
+					postPromise: ['postFactory', function (postFactory) {
+						return postFactory.getAll();
+					}]
+				}
 			});
 
 		$stateProvider
@@ -22,16 +27,16 @@ app.config([
 		$urlRouterProvider.otherwise('home');
 	}]);
 
-app.factory('postFactory', function() {
+app.factory('postFactory', ['$http', function ($http) {
 	var factory = {}
-	factory.posts = [
-		{title: 'Facebook Facebook', link:"https://www.facebook.com", upvotes: 5},
-		{title: 'Twitter is cool too', link:"https://www.twitter.com", upvotes: 2},
-		{title: 'More smashing stuff!', link:"https://www.facebook.com", upvotes: 5},
-		{title: "Look here's another link", link:"https://www.twitter.com", upvotes: 2}
-	]
+	factory.posts = [];
+	factory.getAll = function() {
+		return $http.get('/posts').success(function (data) {
+			angular.copy(data, factory.posts);
+		});
+	};
 	return factory;
-});
+}]);
 
 
 app.controller('MainCtrl', [
