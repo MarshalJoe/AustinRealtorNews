@@ -56,6 +56,9 @@ app.factory('postFactory', ['$http', function ($http) {
 				post.upvotes += 1;
 			});
 	};
+	factory.addComment = function (id, comment) {
+		return $http.post('/posts/' + id + '/comments', comment)
+	};
 	return factory;
 }]);
 
@@ -86,13 +89,14 @@ app.controller('PostsCtrl', [
 'post',
 function ($scope, postFactory, post) {
 	$scope.post = post;	
-	// $scope.addComment = function () {
-	// 	if ($scope.body === '') {return; }
-	// 	$scope.post.comments.push({
-	// 		body: $scope.body,
-	// 		author: 'user',
-	// 		upvotes: 0
-	// 	})
-	// 	$scope.body = '';
-	// };
+	$scope.addComment = function () {
+		if ($scope.body === '') {return; }
+		postFactory.addComment(post._id, {
+			body: $scope.body,
+			author: 'user',
+		}).success(function (comment) {
+			$scope.post.comments.push(comment);
+		});
+		$scope.body = '';
+	};
 }]);
