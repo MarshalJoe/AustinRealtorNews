@@ -59,6 +59,12 @@ app.factory('postFactory', ['$http', function ($http) {
 	factory.addComment = function (id, comment) {
 		return $http.post('/posts/' + id + '/comments', comment)
 	};
+	factory.upvoteComment = function (post, comment) {
+		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote')
+			.success(function (data) {
+				comment.upvotes += 1;
+			});
+	};
 	return factory;
 }]);
 
@@ -98,5 +104,8 @@ function ($scope, postFactory, post) {
 			$scope.post.comments.push(comment);
 		});
 		$scope.body = '';
+	};
+	$scope.incrementUpvotes = function (comment) {
+		postFactory.upvoteComment(post, comment);
 	};
 }]);
