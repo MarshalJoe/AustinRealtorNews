@@ -15,13 +15,16 @@ app.config([
 						return postFactory.getAll();
 					}]
 				}
-			});
-
-		$stateProvider
+			})
 		.state('posts', {
 			url: '/posts/{id}',
 			templateUrl: '/posts.html',
-			controller: 'PostsCtrl'
+			controller: 'PostsCtrl',
+			resolve: {
+        post: ['$stateParams', 'postFactory', function ($stateParams, postFactory) {
+          return postFactory.get($stateParams.id);
+        }]
+      }
 		});
 
 		$urlRouterProvider.otherwise('home');
@@ -32,6 +35,11 @@ app.config([
 app.factory('postFactory', ['$http', function ($http) {
 	var factory = {}
 	factory.posts = [];
+	factory.get = function(id) {
+		return $http.get('/posts/' + id).then(function (res) {
+			return res.data;
+		});
+	};
 	factory.getAll = function() {
 		return $http.get('/posts').success(function (data) {
 			angular.copy(data, factory.posts);
@@ -74,17 +82,17 @@ function ($scope, postFactory) {
 
 app.controller('PostsCtrl', [
 '$scope',
-'$stateParams',
 'postFactory',
-function ($scope, $stateParams, postFactory) {
-	$scope.post = postFactory.posts[$stateParams.id];	
-	$scope.addComment = function () {
-		if ($scope.body === '') {return; }
-		$scope.post.comments.push({
-			body: $scope.body,
-			author: 'user',
-			upvotes: 0
-		})
-		$scope.body = '';
-	};
+'post',
+function ($scope, postFactory, post) {
+	$scope.post = post;	
+	// $scope.addComment = function () {
+	// 	if ($scope.body === '') {return; }
+	// 	$scope.post.comments.push({
+	// 		body: $scope.body,
+	// 		author: 'user',
+	// 		upvotes: 0
+	// 	})
+	// 	$scope.body = '';
+	// };
 }]);
