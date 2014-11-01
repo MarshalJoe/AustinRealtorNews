@@ -31,6 +31,27 @@ router.post('/posts', function (req, res, next) {
 	});
 });
 
+// Return a post
+router.get('/posts/:post', function (req, res, next) {
+	req.post.populate('comments', function (err, post) {
+		res.json(post);
+	});
+});
+
+// Upvote a post
+router.put('/posts/:post/upvote', function (req, res, next) {
+	req.post.upvote(function (err, post) {
+		if(err) {return next(err); }
+
+		res.json(post);
+	});
+});
+
+// DELETE a post
+router.delete('/delete/:post', function (req, res, next) {
+    res.send('delete article ' + req.params.id);
+ });
+
 // Preload post objects on routes with ':post'
 router.param('post', function (req, res, next, id) {
 	var query = Post.findById(id);
@@ -57,21 +78,7 @@ router.param('comment', function (req, res, next, id) {
 	});
 });
 
-// Return a post
-router.get('/posts/:post', function (req, res, next) {
-	req.post.populate('comments', function (err, post) {
-		res.json(post);
-	});
-});
 
-// Upvote a post
-router.put('/posts/:post/upvote', function (req, res, next) {
-	req.post.upvote(function (err, post) {
-		if(err) {return next(err); }
-
-		res.json(post);
-	});
-});
 
 // Create a new comment
 router.post('/posts/:post/comments', function (req, res, next) {
