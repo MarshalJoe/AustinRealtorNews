@@ -48,9 +48,18 @@ router.put('/posts/:post/upvote', function (req, res, next) {
 });
 
 // DELETE a post
-router.delete('/delete/:post', function (req, res, next) {
-    res.send('delete article ' + req.params.id);
- });
+router.get('/delete/:post', function (req, res) {
+		Post.findByIdAndRemove(req.params.post, function(err, doc){
+      res.send(200, doc)
+      
+    });
+});
+// router.delete('/delete/:post', function (req, res, next) {
+//     delete req.body;
+//     res.send('delete article ' + req.body);
+//  });
+
+
 
 // Preload post objects on routes with ':post'
 router.param('post', function (req, res, next, id) {
