@@ -93,9 +93,6 @@ function ($scope, postFactory) {
 		$scope.link = '';
 		window.location.href="#/home";
 	};
-	$scope.deletePost = function (post) {
-		postFactory.deletePost(post);
-	};
 	$scope.incrementUpvotes = function (post) {
 		postFactory.upvote(post);
 	};
@@ -116,6 +113,11 @@ function ($scope, postFactory, post) {
 			$scope.post.comments.push(comment);
 		});
 		$scope.body = '';
+	};
+	$scope.deletePost = function (post) {
+		postFactory.deletePost(post);
+		window.location.href="#/home";
+		window.location.reload();
 	};
 	$scope.incrementUpvotes = function (comment) {
 		postFactory.upvoteComment(post, comment);
