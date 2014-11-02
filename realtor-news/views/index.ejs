@@ -26,6 +26,7 @@
 	<script type="text/ng-template" id="/home.html">
 	  <div>
 	    <h2>Home</h2>
+	    <h3><a href="#/new">new</a></h3>
 	  </div>
 
 	  <div ng-repeat="post in posts | orderBy: '-upvotes'">
@@ -44,6 +45,11 @@
 			</p>
 
 		</div>
+	</script>
+
+	<!-- Create Template -->
+	<script type="text/ng-template" id="/new.html">
+		<h2>Create New Post</h2>		
 
 		<form ng-submit="addPost()">
 			<input type="text" ng-model="title" placeholder="title"></input>
@@ -51,9 +57,8 @@
 			<button type="submit">Post</button>
 		</form>
 
-
-
 	</script>
+
 
 	<!-- Posts Template -->
 	<script type="text/ng-template" id="/posts.html">

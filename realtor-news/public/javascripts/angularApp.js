@@ -16,6 +16,11 @@ app.config([
 					}]
 				}
 			})
+			.state('new', {
+				url: '/new',
+				templateUrl: '/new.html',
+				controller: 'MainCtrl'
+			})
 		.state('posts', {
 			url: '/posts/{id}',
 			templateUrl: '/posts.html',
@@ -86,6 +91,7 @@ function ($scope, postFactory) {
 		});
 		$scope.title = '';
 		$scope.link = '';
+		window.location.href="#/home";
 	};
 	$scope.deletePost = function (post) {
 		postFactory.deletePost(post);
