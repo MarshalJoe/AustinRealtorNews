@@ -61,14 +61,13 @@
 	<!-- Posts Template -->
 	<script type="text/ng-template" id="/posts.html">
 
-		<h3>
-			<a class="title" ng-show="post.link" href="{{post.link}}">
-				{{post.title}}
-			</a>
-			<span class="title" ng-hide="post.link">
-				{{post.title}}
-			</span>
-		</h3>
+		<a class="title" ng-show="post.link" href="{{post.link}}">
+			{{post.title}}
+		</a>
+		<span class="title" ng-hide="post.link">
+			{{post.title}}
+		</span>
+		<br/>
 
 		<div ng-repeat="comment in post.comments | orderBy: '-upvotes'">
 			<span ng-click="incrementUpvotes(comment)">+</span>
@@ -79,12 +78,12 @@
 		</div>
 
 		<form ng-submit="addComment()" style="margin-top:30px;">
-			<h3>Add a new comment</h3>
+			<h4>Add new comment</h4>
 			<input type="text" placeholder="Comment" ng-model="body"></input>
 			<button type="submit">Post</button>
 		</form>
 
-		<button ng-click="deletePost(post)">Delete</button>
+		<button ng-click="deletePost(post)">Delete Post</button>
 
 
 	</script>

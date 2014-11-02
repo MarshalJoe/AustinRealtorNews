@@ -30,4 +30,10 @@ h1 {
   .title {
     font-size: 1.25em;
   }
+
+  .url {
+  	font-size: 1em;
+  }
+
+
 }
