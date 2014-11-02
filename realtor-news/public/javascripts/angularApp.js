@@ -50,6 +50,9 @@ app.factory('postFactory', ['$http', function ($http) {
 			factory.posts.push(data);
 		})
 	};
+	factory.deletePost = function (post) {
+		return $http.get('/delete/' + post._id);
+	}
 	factory.upvote = function (post) {
 		return $http.put('/posts/' + post._id + '/upvote')
 			.success(function (data) {
@@ -83,6 +86,9 @@ function ($scope, postFactory) {
 		});
 		$scope.title = '';
 		$scope.link = '';
+	};
+	$scope.deletePost = function (post) {
+		postFactory.deletePost(post);
 	};
 	$scope.incrementUpvotes = function (post) {
 		postFactory.upvote(post);

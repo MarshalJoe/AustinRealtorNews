@@ -39,7 +39,7 @@
 				{{post.title}}
 			</span>  |
 			<a href="#/posts/{{post._id}}">Comments</a>
-			<a href="#/delete/{{post._id}}">Delete</a>
+			<span ng-click="deletePost(post)">Delete</span>
 			
 			</p>
 
