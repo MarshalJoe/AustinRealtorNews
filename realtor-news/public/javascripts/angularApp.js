@@ -56,7 +56,7 @@ app.factory('postFactory', ['$http', function ($http) {
 		})
 	};
 	factory.deletePost = function (post) {
-		return $http.get('/delete/' + post._id);
+		return $http.delete('/delete/' + post._id);
 	}
 	factory.upvote = function (post) {
 		return $http.put('/posts/' + post._id + '/upvote')

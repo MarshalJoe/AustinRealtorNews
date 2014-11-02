@@ -48,9 +48,9 @@ router.put('/posts/:post/upvote', function (req, res, next) {
 });
 
 // DELETE a post
-router.get('/delete/:post', function (req, res) {
+router.delete('/delete/:post', function (req, res) {
 		Post.findByIdAndRemove(req.params.post, function(err, doc){
-      res.send(200, doc) 
+      res.status(200).send(doc); 
     });
 });
 

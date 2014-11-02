@@ -10,6 +10,7 @@
 	<!-- Foundation, Font Awesome, and custom stylesheets -->
 	<link rel="stylesheet" type="text/css" href="/stylesheets/foundation.css">
 	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href='http://fonts.googleapis.com/css?family=Lora' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
 
 </head>
@@ -26,23 +27,21 @@
 	<script type="text/ng-template" id="/home.html">
 	  <div>
 	    <h2>Home</h2>
-	    <h3><a href="#/new">new</a></h3>
+	    <h3><a href="#/new">Create New Post</a></h3>
 	  </div>
 
 	  <div ng-repeat="post in posts | orderBy: '-upvotes'">
-		
-  		<p>
-  		<span ng-click="incrementUpvotes(post)"><i class="fa fa-caret-up"></i></span> {{post.upvotes}}		
-			<a ng-show="post.link" href="{{post.link}}">
+			<span ng-click="incrementUpvotes(post)"><i class="fa fa-caret-up"></i></span>	
+			<a class="title" ng-show="post.link" href="{{post.link}}">
 				{{post.title}}
 			</a>
-			<span ng-hide="post.link">
+			<span class="title" ng-hide="post.link">
 				{{post.title}}
-			</span>  |
-			<a href="#/posts/{{post._id}}">Comments</a>
-			
-			</p>
-
+			</span>
+			<br/>
+			<span class="upvotes">{{post.upvotes}} points</span>
+			<span class="url">{{post.link}}</span>
+			<a class="comments" href="#/posts/{{post._id}}"> {{post.comments.length}} Comments</a>
 		</div>
 	</script>
 
@@ -63,10 +62,10 @@
 	<script type="text/ng-template" id="/posts.html">
 
 		<h3>
-			<a ng-show="post.link" href="{{post.link}}">
+			<a class="title" ng-show="post.link" href="{{post.link}}">
 				{{post.title}}
 			</a>
-			<span ng-hide="post.link">
+			<span class="title" ng-hide="post.link">
 				{{post.title}}
 			</span>
 		</h3>
