@@ -16,13 +16,26 @@
 </head>
 <body ng-app="realtorNews">
 
-	<footer>
-	<a href="#/home">Austin Realtor News</a>
-	</footer>
+	<div class="wrapper">
+		<header>
+		<a href="#/home">Austin Realtor News</a>
+		</header>
 
-	<div class="large-10 columns large-offset-1"> 
-		<ui-view></ui-view>
+		<div class="row">
+			<div class="large-10 columns large-offset-1"> 
+				<ui-view></ui-view>
+			</div>
+		</div>
+		<div class="push"></div>
 	</div>
+
+	<footer>
+		<ul>
+			<li>Advertise</li>
+			<li>Terms and Conditions</li>
+			<li>Webmasters</li>
+		</ul>
+	</footer>
 	
 
 	<!-- Home Template -->
@@ -89,7 +102,6 @@
 
 
 	</script>
-
 
 
 </body>
