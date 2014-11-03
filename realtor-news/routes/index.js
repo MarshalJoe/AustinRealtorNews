@@ -48,12 +48,11 @@ router.put('/posts/:post/upvote', function (req, res, next) {
 });
 
 // DELETE a post
-router.delete('/delete/:post', function (req, res) {
+router.delete('/delete/post/:post', function (req, res) {
 		Post.findByIdAndRemove(req.params.post, function(err, doc){
       res.status(200).send(doc); 
     });
 });
-
 
 
 // Preload post objects on routes with ':post'
@@ -99,6 +98,14 @@ router.post('/posts/:post/comments', function (req, res, next) {
       res.json(comment);
     });
   });
+});
+
+// Delete a comment
+router.delete('/delete/comment/:comment', function (req, res) {
+		Comment.findByIdAndRemove(req.params.comment, function(err, doc){
+      res.status(200).send(doc); 
+    });
+
 });
 
 

@@ -56,7 +56,7 @@ app.factory('postFactory', ['$http', function ($http) {
 		})
 	};
 	factory.deletePost = function (post) {
-		return $http.delete('/delete/' + post._id);
+		return $http.delete('/delete/post/' + post._id);
 	}
 	factory.upvote = function (post) {
 		return $http.put('/posts/' + post._id + '/upvote')
@@ -66,6 +66,9 @@ app.factory('postFactory', ['$http', function ($http) {
 	};
 	factory.addComment = function (id, comment) {
 		return $http.post('/posts/' + id + '/comments', comment)
+	};
+	factory.deleteComment = function (comment) {
+		return $http.delete('delete/comment/' + comment._id);
 	};
 	factory.upvoteComment = function (post, comment) {
 		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote')
@@ -117,6 +120,10 @@ function ($scope, postFactory, post) {
 	$scope.deletePost = function (post) {
 		postFactory.deletePost(post);
 		window.location.href="#/home";
+		window.location.reload();
+	};
+	$scope.deleteComment = function (comment) {
+		postFactory.deleteComment(comment);
 		window.location.reload();
 	};
 	$scope.incrementUpvotes = function (comment) {

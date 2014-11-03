@@ -16,7 +16,9 @@
 </head>
 <body ng-app="realtorNews">
 
-	<a href="#/home"><h1>Austin Realtor News</h1></a>
+	<footer>
+	<a href="#/home">Austin Realtor News</a>
+	</footer>
 
 	<div class="large-10 columns large-offset-1"> 
 		<ui-view></ui-view>
@@ -26,12 +28,11 @@
 	<!-- Home Template -->
 	<script type="text/ng-template" id="/home.html">
 	  <div>
-	    <h2>Home</h2>
-	    <h3><a href="#/new">Create New Post</a></h3>
+	    <a href="#/new"><button>Create New Post</button></a>
 	  </div>
 
 	  <div ng-repeat="post in posts | orderBy: '-upvotes'">
-			<span ng-click="incrementUpvotes(post)"><i class="fa fa-caret-up"></i></span>	
+			<span ng-click="incrementUpvotes(post)"><i class="fa fa-caret-up fa-2x"></i></span>	
 			<a class="title" ng-show="post.link" href="{{post.link}}">
 				{{post.title}}
 			</a>
@@ -41,7 +42,7 @@
 			<br/>
 			<span class="upvotes">{{post.upvotes}} points</span>
 			<span class="url">{{post.link}}</span>
-			<a class="comments" href="#/posts/{{post._id}}"> {{post.comments.length}} Comments</a>
+			<a class="comments" href="#/posts/{{post._id}}"> {{post.comments.length}} comments</a>
 		</div>
 	</script>
 
@@ -75,6 +76,7 @@
 			<span style="font-size:20px; margin-left:10px;">
 				{{comment.body}}
 			</span>
+			<button class="small round" ng-click="deleteComment(comment)">Delete Comment</button>
 		</div>
 
 		<form ng-submit="addComment()" style="margin-top:30px;">
