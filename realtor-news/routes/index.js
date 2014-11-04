@@ -1,18 +1,57 @@
 var express = require('express');
 var router = express.Router();
-
-
-//GET Home page
-router.get('/', function (req, res) {
-	res.render('index', {title: 'Express'})
-});
-
+var Auth = require('../config/middlewares/authorization');
 var mongoose = require('mongoose');
 var Post = mongoose.model('Post');
 var Comment = mongoose.model('Comment');
+var User = mongoose.model('User');
+
+
+module.exports = function(app, passport){
+
+	//GET Home page
+	app.get('/', function (req, res) {
+		res.render('index', {title: 'Express'})
+	});
+
+	app.get("/login", function(req, res){ 
+		res.render("login");
+	});
+
+	app.post("/login" 
+		,passport.authenticate('local',{
+			successRedirect : "/",
+			failureRedirect : "/login",
+		})
+	);
+
+	app.get("/signup", function (req, res) {
+		res.render("signup");
+	});
+
+	app.post("/signup", Auth.userExist, function (req, res, next) {
+		User.signup(req.body.email, req.body.password, function(err, user){
+			if(err) throw err;
+			req.login(user, function(err){
+				if(err) return next(err);
+				return res.redirect("profile");
+			});
+		});
+	});
+
+
+
+	app.get("/profile", Auth.isAuthenticated , function(req, res){ 
+		res.render("profile", { user : req.user});
+	});
+
+	app.get('/logout', function(req, res){
+		req.logout();
+		res.redirect('/login');
+	});
 
 // GET posts index page
-router.get('/posts', function (req, res, next) {
+app.get('/posts', function (req, res, next) {
   Post.find(function (err, posts) {
   	if (err) {return next(err); }
   
@@ -21,7 +60,7 @@ router.get('/posts', function (req, res, next) {
 });
 
 // POST new post
-router.post('/posts', function (req, res, next) {
+app.post('/posts', function (req, res, next) {
 	var post = new Post(req.body);
 
 	post.save(function (err, post) {
@@ -32,14 +71,14 @@ router.post('/posts', function (req, res, next) {
 });
 
 // Return a post
-router.get('/posts/:post', function (req, res, next) {
+app.get('/posts/:post', function (req, res, next) {
 	req.post.populate('comments', function (err, post) {
 		res.json(post);
 	});
 });
 
 // Upvote a post
-router.put('/posts/:post/upvote', function (req, res, next) {
+app.put('/posts/:post/upvote', function (req, res, next) {
 	req.post.upvote(function (err, post) {
 		if(err) {return next(err); }
 
@@ -48,7 +87,7 @@ router.put('/posts/:post/upvote', function (req, res, next) {
 });
 
 // DELETE a post
-router.delete('/delete/post/:post', function (req, res) {
+app.delete('/delete/post/:post', function (req, res) {
 		Post.findByIdAndRemove(req.params.post, function(err, doc){
       res.status(200).send(doc); 
     });
@@ -56,7 +95,7 @@ router.delete('/delete/post/:post', function (req, res) {
 
 
 // Preload post objects on routes with ':post'
-router.param('post', function (req, res, next, id) {
+app.param('post', function (req, res, next, id) {
 	var query = Post.findById(id);
 
 	query.exec(function (err, post) {
@@ -69,7 +108,7 @@ router.param('post', function (req, res, next, id) {
 });
 
 // Preload comment objects on routes with ':comment'
-router.param('comment', function (req, res, next, id) {
+app.param('comment', function (req, res, next, id) {
 	var query = Comment.findById(id);
 
 	query.exec(function (err, comment) {
@@ -84,7 +123,7 @@ router.param('comment', function (req, res, next, id) {
 
 
 // Create a new comment
-router.post('/posts/:post/comments', function (req, res, next) {
+app.post('/posts/:post/comments', function (req, res, next) {
   var comment = new Comment(req.body);
   comment.post = req.post;
 
@@ -101,7 +140,7 @@ router.post('/posts/:post/comments', function (req, res, next) {
 });
 
 // Delete a comment
-router.delete('/delete/comment/:comment', function (req, res) {
+app.delete('/delete/comment/:comment', function (req, res) {
 		Comment.findByIdAndRemove(req.params.comment, function(err, doc){
       res.status(200).send(doc); 
     });
@@ -110,7 +149,7 @@ router.delete('/delete/comment/:comment', function (req, res) {
 
 
 // Upvote a comment
-router.put('/posts/:post/comments/:comment/upvote', function (req, res, next) {
+app.put('/posts/:post/comments/:comment/upvote', function (req, res, next) {
   req.comment.upvote(function(err, comment){
     if (err) { return next(err); }
 
@@ -120,4 +159,25 @@ router.put('/posts/:post/comments/:comment/upvote', function (req, res, next) {
 
 
 
-module.exports = router;
+
+	//end of exports
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
