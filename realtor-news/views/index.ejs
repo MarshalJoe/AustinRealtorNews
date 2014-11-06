@@ -42,6 +42,8 @@
 	<script type="text/ng-template" id="/home.html">
 	  <div>
 	    <a href="#/new"><button>Create New Post</button></a>
+	    <a href="#/login"><button>Login</button></a>
+	    <a href="#/signup"><button>Signup</button></a>
 	  </div>
 
 	  <div ng-repeat="post in posts | orderBy: '-upvotes'">
@@ -59,7 +61,32 @@
 		</div>
 	</script>
 
-	<!-- Create Template -->
+	<!-- Login Template -->
+	<script type="text/ng-template" id="/login.html">
+		<h2>Login</h2>
+		<form action="/login" method="post">
+			<div>
+				<label>Email:</label>
+				<input type="text" name="email" />
+			</div>
+			<div>
+				<label>Password:</label>
+				<input type="password" name="password"/>
+			</div>
+			<div>
+				<input type="submit" value="Log In" />
+			</div>
+		</form>	
+
+	</script>
+
+	<!-- Signup Template -->
+	<script type="text/ng-template" id="/signup.html" >
+		<h2>Signup</h2>
+
+	</script>
+
+	<!-- Create Post Template -->
 	<script type="text/ng-template" id="/new.html">
 		<h2>Create New Post</h2>		
 
@@ -71,6 +98,9 @@
 
 	</script>
 
+	<script type="text/ng-template" id="/profile.html">
+
+	</script>
 
 	<!-- Posts Template -->
 	<script type="text/ng-template" id="/posts.html">
