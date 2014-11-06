@@ -26,6 +26,11 @@ app.config([
 				templateUrl: '/signup.html',
 				controller: 'MainCtrl'
 			})
+			.state('profile', {
+				url: '/profile',
+				templateUrl: '/profile.html',
+				controller: 'MainCtrl'
+			})
 			.state('new', {
 				url: '/new',
 				templateUrl: '/new.html',

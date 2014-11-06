@@ -5,7 +5,7 @@ exports.isAuthenticated = function (req, res, next){
     if(req.isAuthenticated()){
         next();
     }else{
-        res.redirect("/login");
+        res.redirect("/");
     }
 }
 
@@ -16,7 +16,7 @@ exports.userExist = function(req, res, next) {
         if (count === 0) {
             next();
         } else {
-            res.redirect("/signup");
+            res.redirect("/");
         }
     });
 }
