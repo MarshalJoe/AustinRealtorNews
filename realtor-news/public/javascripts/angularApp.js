@@ -1,4 +1,10 @@
-var app = angular.module('realtorNews', ['ui.router']);
+var app = angular.module('realtorNews', [
+	'ui.router',
+	'ngCookies',
+	'ngResource',
+	'ngSanitize',
+	'http-auth-interceptor',
+]);
 
 
 app.config([
@@ -24,7 +30,7 @@ app.config([
 			.state('signup', {
 				url: '/signup',
 				templateUrl: '/signup.html',
-				controller: 'MainCtrl'
+				controller: 'SignupCtrl'
 			})
 			.state('profile', {
 				url: '/profile',
@@ -51,7 +57,7 @@ app.config([
 	}]);
 
 
-// Factory service for Mongo
+// Post factory using Mongo
 app.factory('postFactory', ['$http', function ($http) {
 	var factory = {}
 	factory.posts = [];
@@ -99,11 +105,107 @@ app.factory('postFactory', ['$http', function ($http) {
 	return factory;
 }]);
 
+// Authentication factory
+app.factory('Auth', function Auth($location, $rootScope, Session, User, $cookieStore) {
+    $rootScope.currentUser = $cookieStore.get('user') || null;
+    $cookieStore.remove('user');
 
+    return {
+
+      login: function(provider, user, callback) {
+        var cb = callback || angular.noop;
+        Session.save({
+          provider: provider,
+          email: user.email,
+          password: user.password,
+          rememberMe: user.rememberMe
+        }, function(user) {
+          $rootScope.currentUser = user;
+          return cb();
+        }, function(err) {
+          return cb(err.data);
+        });
+      },
+
+      logout: function(callback) {
+        var cb = callback || angular.noop;
+        Session.delete(function(res) {
+            $rootScope.currentUser = null;
+            return cb();
+          },
+          function(err) {
+            return cb(err.data);
+          });
+      },
+
+      createUser: function(userinfo, callback) {
+        var cb = callback || angular.noop;
+        User.save(userinfo,
+          function(user) {
+            $rootScope.currentUser = user;
+            return cb();
+          },
+          function(err) {
+            return cb(err.data);
+          });
+      },
+
+      currentUser: function() {
+        Session.get(function(user) {
+          $rootScope.currentUser = user;
+        });
+      },
+
+      changePassword: function(email, oldPassword, newPassword, callback) {
+        var cb = callback || angular.noop;
+        User.update({
+          email: email,
+          oldPassword: oldPassword,
+          newPassword: newPassword
+        }, function(user) {
+            console.log('password changed');
+            return cb();
+        }, function(err) {
+            return cb(err.data);
+        });
+      },
+
+      removeUser: function(email, password, callback) {
+        var cb = callback || angular.noop;
+        User.delete({
+          email: email,
+          password: password
+        }, function(user) {
+            console.log(user + 'removed');
+            return cb();
+        }, function(err) {
+            return cb(err.data);
+        });
+      }
+    };
+  });
+
+// User factory
+app.factory('User', function ($resource) {
+    return $resource('/auth/users/:id/', {},
+      {
+        'update': {
+          method:'PUT'
+        }
+      });
+});
+
+// Session factory
+app.factory('Session', function ($resource) {
+    return $resource('/auth/session/');
+  });
+
+// Main Controller
 app.controller('MainCtrl', [
 '$scope',
 'postFactory',
-function ($scope, postFactory) {
+'Auth',
+function ($scope, postFactory, Auth) {
 	$scope.posts = postFactory.posts;
 	$scope.user = {};
 	$scope.addPost = function () {
@@ -141,6 +243,61 @@ function ($scope, postFactory) {
 	};
 }]);
 
+// Navbar Controller
+app.controller('NavbarCtrl', [
+	'$scope',
+	'Auth',
+	'$location',
+	function ($scope, Auth, $location) {
+    $scope.menu = [{
+      "title": "Blogs",
+      "link": "blogs"
+    }];
+
+    $scope.authMenu = [{
+      "title": "Create New Blog",
+      "link": "blogs/create"
+    }];
+
+    $scope.logout = function() {
+      Auth.logout(function(err) {
+        if(!err) {
+          $location.path('/login');
+        }
+      });
+    };
+  }]);
+
+// Signup Controller
+app.controller('SignupCtrl', [
+	'$scope',
+	'Auth',
+	'$location',
+	function ($scope, Auth, $location) {
+    $scope.register = function(form) {
+      Auth.createUser({
+          email: $scope.user.email,
+          username: $scope.user.username,
+          password: $scope.user.password
+        },
+        function(err) {
+          $scope.errors = {};
+
+          if (!err) {
+            $location.path('/');
+          } else {
+            angular.forEach(err.errors, function(error, field) {
+              form[field].$setValidity('mongoose', false);
+              $scope.errors[field] = error.type;
+            });
+          }
+        }
+      );
+    };
+  }]);
+
+
+// Posts Controller
 app.controller('PostsCtrl', [
 '$scope',
 'postFactory',
@@ -170,3 +327,65 @@ function ($scope, postFactory, post) {
 		postFactory.upvoteComment(post, comment);
 	};
 }]);
+
+// Directives
+app.directive('mongooseError', function () {
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      link: function(scope, element, attrs, ngModel) {
+        element.on('keydown', function() {
+          return ngModel.$setValidity('mongoose', true);
+        });
+      }
+    };
+  });
+
+app.constant('focusConfig', {
+    focusClass: 'focused'
+  })
+
+  .directive('onFocus', function (focusConfig) {
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      link: function(scope, element, attrs, ngModel) {
+        ngModel.$focused = false;
+        element
+          .bind('focus', function(evt) {
+            element.addClass(focusConfig.focusClass);
+            scope.$apply(function() {ngModel.$focused = true;});
+          })
+          .bind('blur', function(evt) {
+            element.removeClass(focusConfig.focusClass);
+            scope.$apply(function() {ngModel.$focused = false;});
+          });
+      }
+    }
+  });
+
+  app.directive('uniqueUsername', function ($http) {
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      link: function (scope, element, attrs, ngModel) {
+        function validate(value) {
+          if(!value) {
+            ngModel.$setValidity('unique', true);
+            return;
+          }
+          $http.get('/auth/check_username/' + value).success(function(user) {
+            if(!user.exists) {
+              ngModel.$setValidity('unique', true);
+            } else {
+              ngModel.$setValidity('unique', false);
+            }
+          });
+        }
+
+        scope.$watch( function() {
+          return ngModel.$viewValue;
+        }, validate);
+      }
+    };
+  });
