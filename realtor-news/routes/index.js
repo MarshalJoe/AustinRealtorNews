@@ -1,6 +1,4 @@
 var express = require('express');
-var router = express.Router();
-var Auth = require('../config/middlewares/authorization');
 var mongoose = require('mongoose');
 var Post = mongoose.model('Post');
 var Comment = mongoose.model('Comment');
@@ -22,7 +20,7 @@ module.exports = function(app, passport){
 	// Login form authentication
 	app.post("/login" 
 		,passport.authenticate('local',{
-			successRedirect : "/#/signup",
+			successRedirect : "/#/profile",
 			failureRedirect : "/#/signup",
 		})
 	);
@@ -33,20 +31,20 @@ module.exports = function(app, passport){
 	});
 
 	// POST-powered sign up
-	app.post("/signup", Auth.userExist, function (req, res, next) {
-		User.signup(req.body.email, req.body.password, function(err, user){
-			if(err) throw err;
-			req.login(user, function(err){
-				if(err) return next(err);
-				return res.redirect("/");
-			});
-		});
-	});
+	// app.post("/signup", Auth.userExist, function (req, res, next) {
+	// 	User.signup(req.body.email, req.body.password, function(err, user){
+	// 		if(err) throw err;
+	// 		req.login(user, function(err){
+	// 			if(err) return next(err);
+	// 			return res.redirect("/");
+	// 		});
+	// 	});
+	// });
 
 	// Profile
-	app.get("/profile", Auth.isAuthenticated , function(req, res){ 
-		res.render("profile", { user : req.user});
-	});
+	// app.get("/profile", Auth.isAuthenticated , function(req, res){ 
+	// 	res.render("profile", { user : req.user});
+	// });
 
 	// Logout
 	app.get('/logout', function(req, res){

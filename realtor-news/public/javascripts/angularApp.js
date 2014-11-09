@@ -91,6 +91,11 @@ app.factory('postFactory', ['$http', function ($http) {
 				comment.upvotes += 1;
 			});
 	};
+	factory.signup = function () {
+		return $http.post('/signup').success(function (data) {
+			console.log("successully called factory function");
+		})
+	};
 	return factory;
 }]);
 
@@ -100,6 +105,7 @@ app.controller('MainCtrl', [
 'postFactory',
 function ($scope, postFactory) {
 	$scope.posts = postFactory.posts;
+	$scope.user = {};
 	$scope.addPost = function () {
 		if($scope.title === '') {return;}
 		postFactory.create({
@@ -111,6 +117,25 @@ function ($scope, postFactory) {
 		$scope.link = '';
 		window.location.href="#/home";
 	};
+  $scope.login = function(form) {
+    Auth.login('password', {
+        'email': $scope.user.email,
+        'password': $scope.user.password
+      },
+      function(err) {
+        $scope.errors = {};
+
+        if (!err) {
+          $location.path('/');
+        } else {
+          angular.forEach(err.errors, function(error, field) {
+            form[field].$setValidity('mongoose', false);
+            $scope.errors[field] = error.type;
+          });
+          $scope.error.other = err.message;
+        }
+    });
+  };
 	$scope.incrementUpvotes = function (post) {
 		postFactory.upvote(post);
 	};

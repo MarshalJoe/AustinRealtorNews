@@ -14,9 +14,11 @@ var env = process.env.NODE_ENV || 'development',
 
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var session = require('express-session');
+var expressSession = require('express-session');
+var methodOverride = require('method-override');
 // set up Mongo
 var mongoose = require('mongoose');
+var mongoStore = require('connect-mongo')(expressSession);
 
 mongoose.connect('mongodb://localhost/news');
 require("./models/Posts");
@@ -27,18 +29,23 @@ require("./models/User");
 
 var app = express();
 
+var pass = require('./config/passport');
+
+app.use(cookieParser());
+
 // required for passport
-require('./config/passport')(passport, config)
-app.use(session({ secret: "purplemonkeydishwasher",
-                    saveUninitialized: true,
-                    resave: true }));
+app.use(expressSession({
+  secret: 'MEAN',
+  saveUninitialized: true,
+  resave: true,
+  store: new mongoStore({
+    url: config.db,
+    collection: 'sessions'
+  })
+}));
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session 
-
-// routes
-
-//require("./routes/index.js")(app, passport); // load routes and pass in our app and configured passport
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -49,11 +56,10 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', routes); //old routing code
-//app.use(app.router());
+// ruotes should be last
 require('./routes/index')(app, passport);
 
 // catch 404 and forward to error handler

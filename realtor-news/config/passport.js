@@ -1,26 +1,46 @@
-var mongoose = require('mongoose')
-  , LocalStrategy = require('passport-local').Strategy
-  , User = mongoose.model('User');
+'use strict';
 
+var mongoose = require('mongoose'),
+    passport = require('passport'),
+    LocalStrategy = require('passport-local').Strategy,
+    User = mongoose.model('User');
 
-module.exports = function (passport, config) {
+// Serialize sessions
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
 
-	passport.serializeUser(function(user, done) {
-		done(null, user.id);
-	});
+passport.deserializeUser(function(id, done) {
+  User.findOne({ _id: id }, function (err, user) {
+    done(err, user);
+  });
+});
 
-	passport.deserializeUser(function(id, done) {
-		User.findOne({ _id: id }, function (err, user) {
-			done(err, user);
-		});
-	});
-
-  	passport.use(new LocalStrategy({
-		usernameField: 'email',
-		passwordField: 'password'
-    },
-    function(email, password, done) {
-    	User.isValidUserPassword(email, password, done);
-    }));
-
-}
+// Use local strategy
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+  },
+  function(email, password, done) {
+    User.findOne({ email: email }, function (err, user) {
+      if (err) {
+        return done(err);
+      }
+      if (!user) {
+        return done(null, false, {
+          'errors': {
+            'email': { type: 'Email is not registered.' }
+          }
+        });
+      }
+      if (!user.authenticate(password)) {
+        return done(null, false, {
+          'errors': {
+            'password': { type: 'Password is incorrect.' }
+          }
+        });
+      }
+      return done(null, user);
+    });
+  }
+));
