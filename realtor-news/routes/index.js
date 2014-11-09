@@ -15,15 +15,15 @@ module.exports = function(app, passport){
 	});
 
 	// Login 
-	app.get("/login", function(req, res){ 
-		res.render("login");
+	app.get("/login", function (req, res){ 
+		res.render("/login.html");
 	});
 
 	// Login form authentication
 	app.post("/login" 
 		,passport.authenticate('local',{
-			successRedirect : "/",
-			failureRedirect : "/",
+			successRedirect : "/#/signup",
+			failureRedirect : "/#/signup",
 		})
 	);
 
