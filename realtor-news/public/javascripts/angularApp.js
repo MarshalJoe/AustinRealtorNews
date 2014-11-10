@@ -30,7 +30,7 @@ app.config([
 			.state('signup', {
 				url: '/signup',
 				templateUrl: '/signup.html',
-				controller: 'SignupCtrl'
+				controller: 'MainCtrl'
 			})
 			.state('profile', {
 				url: '/profile',
@@ -97,13 +97,31 @@ app.factory('postFactory', ['$http', function ($http) {
 				comment.upvotes += 1;
 			});
 	};
-	factory.signup = function () {
-		return $http.post('/signup').success(function (data) {
+	factory.createUser = function (user) {
+		console.log("createUser function in postFactory called");
+		return $http.post('/signup', user).success(function (data) {
+			$rootScope.currentUser = user;
 			console.log("successully called factory function");
 		})
 	};
 	return factory;
 }]);
+
+
+// User factory
+app.factory('User', function ($resource) {
+    return $resource('/auth/users/:id/', {},
+      {
+        'update': {
+          method:'PUT'
+        }
+      });
+});
+
+// Session factory
+app.factory('Session', function ($resource) {
+    return $resource('/auth/session/');
+});
 
 // Authentication factory
 app.factory('Auth', function Auth($location, $rootScope, Session, User, $cookieStore) {
@@ -131,18 +149,6 @@ app.factory('Auth', function Auth($location, $rootScope, Session, User, $cookieS
         var cb = callback || angular.noop;
         Session.delete(function(res) {
             $rootScope.currentUser = null;
-            return cb();
-          },
-          function(err) {
-            return cb(err.data);
-          });
-      },
-
-      createUser: function(userinfo, callback) {
-        var cb = callback || angular.noop;
-        User.save(userinfo,
-          function(user) {
-            $rootScope.currentUser = user;
             return cb();
           },
           function(err) {
@@ -185,21 +191,6 @@ app.factory('Auth', function Auth($location, $rootScope, Session, User, $cookieS
     };
   });
 
-// User factory
-app.factory('User', function ($resource) {
-    return $resource('/auth/users/:id/', {},
-      {
-        'update': {
-          method:'PUT'
-        }
-      });
-});
-
-// Session factory
-app.factory('Session', function ($resource) {
-    return $resource('/auth/session/');
-  });
-
 // Main Controller
 app.controller('MainCtrl', [
 '$scope',
@@ -219,6 +210,22 @@ function ($scope, postFactory, Auth) {
 		$scope.link = '';
 		window.location.href="#/home";
 	};
+	$scope.register = function(form) {
+      console.log('register function called');
+      postFactory.createUser({
+          email: $scope.user.email,
+          username: $scope.user.username,
+          password: $scope.user.password
+        }
+      );
+    };
+  $scope.logout = function() {
+    Auth.logout(function(err) {
+      if(!err) {
+        $location.path('/login');
+      }
+    });
+  };
   $scope.login = function(form) {
     Auth.login('password', {
         'email': $scope.user.email,
@@ -242,59 +249,6 @@ function ($scope, postFactory, Auth) {
 		postFactory.upvote(post);
 	};
 }]);
-
-// Navbar Controller
-app.controller('NavbarCtrl', [
-	'$scope',
-	'Auth',
-	'$location',
-	function ($scope, Auth, $location) {
-    $scope.menu = [{
-      "title": "Blogs",
-      "link": "blogs"
-    }];
-
-    $scope.authMenu = [{
-      "title": "Create New Blog",
-      "link": "blogs/create"
-    }];
-
-    $scope.logout = function() {
-      Auth.logout(function(err) {
-        if(!err) {
-          $location.path('/login');
-        }
-      });
-    };
-  }]);
-
-// Signup Controller
-app.controller('SignupCtrl', [
-	'$scope',
-	'Auth',
-	'$location',
-	function ($scope, Auth, $location) {
-    $scope.register = function(form) {
-      Auth.createUser({
-          email: $scope.user.email,
-          username: $scope.user.username,
-          password: $scope.user.password
-        },
-        function(err) {
-          $scope.errors = {};
-
-          if (!err) {
-            $location.path('/');
-          } else {
-            angular.forEach(err.errors, function(error, field) {
-              form[field].$setValidity('mongoose', false);
-              $scope.errors[field] = error.type;
-            });
-          }
-        }
-      );
-    };
-  }]);
 
 
 // Posts Controller
@@ -328,64 +282,21 @@ function ($scope, postFactory, post) {
 	};
 }]);
 
-// Directives
-app.directive('mongooseError', function () {
-    return {
-      restrict: 'A',
-      require: 'ngModel',
-      link: function(scope, element, attrs, ngModel) {
-        element.on('keydown', function() {
-          return ngModel.$setValidity('mongoose', true);
-        });
+
+  app.run(function ($rootScope, $location, Auth) {
+
+    //watching the value of the currentUser variable.
+    $rootScope.$watch('currentUser', function(currentUser) {
+      // if no currentUser and on a page that requires authorization then try to update it
+      // will trigger 401s if user does not have a valid session
+      if (!currentUser && (['/', '/login', '/logout', '/signup'].indexOf($location.path()) == -1 )) {
+        Auth.currentUser();
       }
-    };
-  });
+    });
 
-app.constant('focusConfig', {
-    focusClass: 'focused'
-  })
-
-  .directive('onFocus', function (focusConfig) {
-    return {
-      restrict: 'A',
-      require: 'ngModel',
-      link: function(scope, element, attrs, ngModel) {
-        ngModel.$focused = false;
-        element
-          .bind('focus', function(evt) {
-            element.addClass(focusConfig.focusClass);
-            scope.$apply(function() {ngModel.$focused = true;});
-          })
-          .bind('blur', function(evt) {
-            element.removeClass(focusConfig.focusClass);
-            scope.$apply(function() {ngModel.$focused = false;});
-          });
-      }
-    }
-  });
-
-  app.directive('uniqueUsername', function ($http) {
-    return {
-      restrict: 'A',
-      require: 'ngModel',
-      link: function (scope, element, attrs, ngModel) {
-        function validate(value) {
-          if(!value) {
-            ngModel.$setValidity('unique', true);
-            return;
-          }
-          $http.get('/auth/check_username/' + value).success(function(user) {
-            if(!user.exists) {
-              ngModel.$setValidity('unique', true);
-            } else {
-              ngModel.$setValidity('unique', false);
-            }
-          });
-        }
-
-        scope.$watch( function() {
-          return ngModel.$viewValue;
-        }, validate);
-      }
-    };
+    // On catching 401 errors, redirect to the login page.
+    // $rootScope.$on('event:auth-loginRequired', function() {
+    //   $location.path('/login');
+    //   return false;
+    // });
   });

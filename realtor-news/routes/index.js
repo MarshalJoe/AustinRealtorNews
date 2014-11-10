@@ -3,13 +3,23 @@ var mongoose = require('mongoose');
 var Post = mongoose.model('Post');
 var Comment = mongoose.model('Comment');
 var User = mongoose.model('User');
-var auth = require('../config/auth');
+//var auth = require('../config/auth');
+
+var isAuthenticated = function (req, res, next) {
+	// if user is authenticated in the session, call the next() to call the next request handler 
+	// Passport adds this method to request object. A middleware is allowed to add properties to
+	// request and response objects
+	if (req.isAuthenticated())
+		return next();
+	// if the user is not authenticated then redirect him to the login page
+	res.redirect('/');
+}
 
 module.exports = function(app, passport){
 
 	// GET Home page
 	app.get('/', function (req, res) {
-		res.render('index', {title: 'Express'})
+		res.render('index', {user: req.user});
 	});
 
 	// Login 
@@ -18,36 +28,45 @@ module.exports = function(app, passport){
 	});
 
 	// Login form authentication
-	app.post("/login" 
-		,passport.authenticate('local',{
-			successRedirect : "/#/profile",
-			failureRedirect : "/#/signup",
-		})
-	);
+	app.post('/login', passport.authenticate('login', {
+    successRedirect : "/#/profile",
+		failureRedirect : "/#/signup"  
+	}));
 
-	// Signup
+	// Signup form
 	app.get("/signup", function (req, res) {
-		res.render("signup");
+		res.render("/signup.html");
 	});
 
 	//POST-powered sign up
-	app.post("/signup", auth.ensureAuthenticated, function (req, res, next) {
-		User.signup(req.body.email, req.body.password, function(err, user){
-			if(err) throw err;
-			req.login(user, function(err){
-				if(err) return next(err);
-				return res.redirect("/");
-			});
-		});
-	});
+	// app.post("/signup", function (req, res, next) {
+	// 	console.log('route received');
+	// 	console.log('username is ' + req.body.username);
+	// 	console.log('email is ' + req.body.email);
+	// 	console.log('password is ' + req.body.password);
+	// 	User.create({
+ //          email: req.body.email,
+ //          username: req.body.username,
+ //          password: req.body.password
+ //        });
+	// 	console.log('User created');
+
+	// 	res.status(200);
+	// });
+
+	/* Handle Registration POST */
+  app.post('/signup', passport.authenticate('signup', {
+    successRedirect: '/#/home',
+    failureRedirect: '/#/signup'
+  }));
 
 	//Profile
-	app.get("/profile", auth.ensureAuthenticated , function(req, res){ 
+	app.get("/profile", function (req, res){ 
 		res.render("profile", { user : req.user});
 	});
 
 	// Logout
-	app.get('/logout', function(req, res){
+	app.get('/logout', function (req, res){
 		req.logout();
 		res.redirect('/login');
 	});

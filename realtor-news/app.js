@@ -5,7 +5,7 @@ var logger = require('morgan');
 
 // passport stuff
 var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
+
 var flash = require('connect-flash');
 
 // config files
@@ -25,11 +25,7 @@ require("./models/Posts");
 require("./models/Comments");
 require("./models/User");
 
-//var routes = require('./routes/index');
-
 var app = express();
-
-var pass = require('./config/passport');
 
 app.use(cookieParser());
 
@@ -58,6 +54,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
+
+var initPassport = require('./passport/init');
+initPassport(passport);
 
 // ruotes should be last
 require('./routes/index')(app, passport);
