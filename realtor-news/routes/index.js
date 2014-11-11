@@ -22,39 +22,23 @@ module.exports = function(app, passport){
 		res.render('index', {user: req.user});
 	});
 
-	// Login 
+	// GET Login form 
 	app.get("/login", function (req, res){ 
 		res.render("/login.html");
 	});
 
-	// Login form authentication
+	// POST Login form authentication
 	app.post('/login', passport.authenticate('login', {
     successRedirect : "/#/profile",
 		failureRedirect : "/#/signup"  
 	}));
 
-	// Signup form
+	// GET Signup form
 	app.get("/signup", function (req, res) {
 		res.render("/signup.html");
 	});
 
-	//POST-powered sign up
-	// app.post("/signup", function (req, res, next) {
-	// 	console.log('route received');
-	// 	console.log('username is ' + req.body.username);
-	// 	console.log('email is ' + req.body.email);
-	// 	console.log('password is ' + req.body.password);
-	// 	User.create({
- //          email: req.body.email,
- //          username: req.body.username,
- //          password: req.body.password
- //        });
-	// 	console.log('User created');
-
-	// 	res.status(200);
-	// });
-
-	/* Handle Registration POST */
+	// POST signup authentication
   app.post('/signup', passport.authenticate('signup', {
     successRedirect: '/#/home',
     failureRedirect: '/#/signup'
@@ -80,7 +64,7 @@ module.exports = function(app, passport){
 	  });
 	});
 
-	// POST new post
+	// POST create a new post
 	app.post('/posts', function (req, res, next) {
 		var post = new Post(req.body);
 
@@ -143,7 +127,7 @@ module.exports = function(app, passport){
 
 
 
-	// Create a new comment
+	// POST create a new comment
 	app.post('/posts/:post/comments', function (req, res, next) {
 	  var comment = new Comment(req.body);
 	  comment.post = req.post;
