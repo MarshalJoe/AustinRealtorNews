@@ -5,6 +5,7 @@ var bCrypt = require('bcrypt-nodejs');
 
 module.exports = function(passport){
 
+// signup passport strategy
 	passport.use('signup', new LocalStrategy({
             passReqToCallback : true // allows us to pass back the entire request to the callback
         },
