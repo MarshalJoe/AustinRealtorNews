@@ -97,13 +97,18 @@ app.factory('postFactory', ['$http', function ($http) {
 				comment.upvotes += 1;
 			});
 	};
-	factory.createUser = function (user) {
-		console.log("createUser function in postFactory called");
-		return $http.post('/signup', user).success(function (data) {
-			$rootScope.currentUser = user;
-			console.log("successully called factory function");
-		})
-	};
+	// factory.createUser = function (user) {
+	// 	console.log("createUser function in postFactory called");
+	// 	return $http.post('/signup', user).success(function (data) {
+	// 		console.log("successully called factory function");
+	// 	})
+	// };
+	// factory.login = function () {
+	// 	console.log("login postFactory called");
+	// 	return $http.post('/login', user).success(function (data) {
+	// 		console.log('successfully called login postFactory function');
+	// 	})
+	// }
 	return factory;
 }]);
 
@@ -131,6 +136,7 @@ app.factory('Auth', function Auth($location, $rootScope, Session, User, $cookieS
     return {
 
       login: function(provider, user, callback) {
+      	console.log("login auth factory function called");
         var cb = callback || angular.noop;
         Session.save({
           provider: provider,
@@ -227,8 +233,9 @@ function ($scope, postFactory, Auth) {
     });
   };
   $scope.login = function(form) {
-    Auth.login('password', {
-        'email': $scope.user.email,
+    console.log("login function called");
+    postFactory.login('password', {
+        'username': $scope.user.username,
         'password': $scope.user.password
       },
       function(err) {

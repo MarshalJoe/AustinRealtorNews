@@ -30,7 +30,8 @@ module.exports = function(app, passport){
 	// POST Login form authentication
 	app.post('/login', passport.authenticate('login', {
     successRedirect : "/#/profile",
-		failureRedirect : "/#/signup"  
+		failureRedirect : "/#/signup",
+		failureFlash: true  
 	}));
 
 	// GET Signup form
@@ -41,7 +42,9 @@ module.exports = function(app, passport){
 	// POST signup authentication
   app.post('/signup', passport.authenticate('signup', {
     successRedirect: '/#/home',
-    failureRedirect: '/#/signup'
+    failureRedirect: '/#/signup',
+    successFlash: "Registration successful",
+    failureFlash: true
   }));
 
 	//Profile
