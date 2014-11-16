@@ -19,7 +19,10 @@ module.exports = function(app, passport){
 
 	// GET Home page
 	app.get('/', function (req, res) {
-		res.render('index', {user: req.user});
+		console.log(req.user);
+		res.render('index', {
+			user: req.user
+		});
 	});
 
 	// GET Login form 
@@ -28,11 +31,28 @@ module.exports = function(app, passport){
 	});
 
 	// POST Login form authentication
-	app.post('/login', passport.authenticate('login', {
-    successRedirect : "/#/profile",
-		failureRedirect : "/#/signup",
-		failureFlash: true  
-	}));
+	app.post('/login', function(req, res, next) {
+  	passport.authenticate('login', function(err, user, message) {
+	  	if (err) {
+	  		return res.json({
+	  			error: true,
+	  			message: 'Something went wrong'
+	  		});
+	  	}
+
+	  	if (user === false) {
+	  		return res.json({
+	  			error: true,
+	  			message: message
+	  		});
+	  	}
+
+	  	return res.json({
+	  		error: false,
+	  		user: user
+	  	});
+  	})(req, res, next);
+  });
 
 	// GET Signup form
 	app.get("/signup", function (req, res) {
@@ -40,12 +60,28 @@ module.exports = function(app, passport){
 	});
 
 	// POST signup authentication
-  app.post('/signup', passport.authenticate('signup', {
-    successRedirect: '/#/home',
-    failureRedirect: '/#/signup',
-    successFlash: "Registration successful",
-    failureFlash: true
-  }));
+  app.post('/signup', function(req, res, next) {
+  	passport.authenticate('signup', function(err, user, message) {
+	  	if (err) {
+	  		return res.json({
+	  			error: true,
+	  			message: 'Something went wrong'
+	  		});
+	  	}
+
+	  	if (user === false) {
+	  		return res.json({
+	  			error: true,
+	  			message: 'User already exists with username'
+	  		});
+	  	}
+
+	  	return res.json({
+	  		error: false,
+	  		user: user
+	  	});
+  	})(req, res, next);
+  });
 
 	//Profile
 	app.get("/profile", function (req, res){ 

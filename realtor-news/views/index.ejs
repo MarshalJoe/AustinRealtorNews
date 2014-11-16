@@ -41,7 +41,10 @@
     	
     	<!-- Right Nav Section -->	
     	<ul class="right">
-      	<li><a href="#"></a></li>
+      	<li>
+      		<a href="#" ng-show="user"> {{user.username}} </a>
+      		<a href="#">Log in</a>
+      	</li>
       	<li class="has-dropdown">
         <a href="#">Right Button Dropdown</a>
         	<ul class="dropdown">
@@ -106,9 +109,9 @@
 		<div class="stretcher">
 		<h2>Login</h2>
 		
-    <form action="/login" method="POST">
-	      <input type="text" name="username" placeholder="Username" required="required"/>
-	      <input type="password" name="password" placeholder="Password" required="required"/>
+    <form ng-submit="login()">
+	      <input type="text" name="username" placeholder="Username" required="required" ng-model="credential.username"/>
+	      <input type="password" name="password" placeholder="Password" required="required" ng-model="credential.password"/>
 	      <button type="submit">Register</button>
 	    </form>
 
@@ -120,13 +123,15 @@
 	<script type="text/ng-template" id="/signup.html" >
 		<div class="stretcher">
 		<h2>Signup</h2>
-			<form action="/signup" method="POST">
-	      <input type="text" name="username" placeholder="Username" required="required"/>
-	      <input type="password" name="password" placeholder="Password" required="required"/>
-	      <input type="email" name="email" placeholder="Email" required="required"/>
+			<form ng-submit="register()">
+	      <input type="text" name="username" placeholder="Username" required="required" ng-model="credential.username"/>
+	      <input type="password" name="password" placeholder="Password" required="required" ng-model="credential.password"/>
+	      <input type="email" name="email" placeholder="Email" required="required" ng-model="credential.email"/>
 	      <button type="submit">Register</button>
 	    </form>	
     </div>
+
+    <p ng-if="error"> {{ errorMessage }} </p>
 	</script>
 
 	<!-- Create Post Template -->
@@ -145,6 +150,7 @@
 	<script type="text/ng-template" id="/profile.html">
 		<div class="stretcher">
 			<h2>Profile</h2>
+			<h3>Hello</h3>
 		</div>	
 	</script>
 

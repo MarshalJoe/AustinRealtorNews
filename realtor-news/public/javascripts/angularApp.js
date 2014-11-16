@@ -97,18 +97,14 @@ app.factory('postFactory', ['$http', function ($http) {
 				comment.upvotes += 1;
 			});
 	};
-	// factory.createUser = function (user) {
-	// 	console.log("createUser function in postFactory called");
-	// 	return $http.post('/signup', user).success(function (data) {
-	// 		console.log("successully called factory function");
-	// 	})
-	// };
-	// factory.login = function () {
-	// 	console.log("login postFactory called");
-	// 	return $http.post('/login', user).success(function (data) {
-	// 		console.log('successfully called login postFactory function');
-	// 	})
-	// }
+	factory.createUser = function (user) {
+		console.log("createUser function in postFactory called");
+		return $http.post('/signup', user);
+	};
+	factory.login = function (user) {
+		console.log("login postFactory called");
+		return $http.post('/login', user);
+	}
 	return factory;
 }]);
 
@@ -200,9 +196,11 @@ app.factory('Auth', function Auth($location, $rootScope, Session, User, $cookieS
 // Main Controller
 app.controller('MainCtrl', [
 '$scope',
+'$rootScope',
 'postFactory',
 'Auth',
-function ($scope, postFactory, Auth) {
+'$location',
+function ($scope, $rootScope, postFactory, Auth, $location) {
 	$scope.posts = postFactory.posts;
 	$scope.user = {};
 	$scope.addPost = function () {
@@ -216,14 +214,22 @@ function ($scope, postFactory, Auth) {
 		$scope.link = '';
 		window.location.href="#/home";
 	};
-	$scope.register = function(form) {
+	$scope.user = window.user;
+	$scope.register = function() {
       console.log('register function called');
-      postFactory.createUser({
-          email: $scope.user.email,
-          username: $scope.user.username,
-          password: $scope.user.password
-        }
-      );
+      postFactory.createUser($scope.credential).success(function (response) {
+				console.log(response, response.error);
+				if (response.error) {
+					$scope.error = true;
+					return $scope.errorMessage = response.message;
+				}
+
+				$rootScope.user = response.user;
+				$scope.credential = null;
+				$location.path('/');
+			}).error(function (err) {
+				console.log(err);
+			});
     };
   $scope.logout = function() {
     Auth.logout(function(err) {
@@ -232,24 +238,18 @@ function ($scope, postFactory, Auth) {
       }
     });
   };
-  $scope.login = function(form) {
+  $scope.login = function() {
     console.log("login function called");
-    postFactory.login('password', {
-        'username': $scope.user.username,
-        'password': $scope.user.password
-      },
-      function(err) {
-        $scope.errors = {};
+    postFactory.login($scope.credential).success(function(response) {
+     		
+        if (response.error) {
+        	return $scope.error = response.message;
+        } 
 
-        if (!err) {
-          $location.path('/');
-        } else {
-          angular.forEach(err.errors, function(error, field) {
-            form[field].$setValidity('mongoose', false);
-            $scope.errors[field] = error.type;
-          });
-          $scope.error.other = err.message;
-        }
+        $rootScope.user = response.user;
+        $location.path('/');
+    }).error(function (err) {
+    	console.log(err);
     });
   };
 	$scope.incrementUpvotes = function (post) {
